@@ -7,18 +7,39 @@ from pydataset import data
 
 
 # Titanic
-def get_titanic_data():
-    filename = 'titanic.csv'
-    if os.path.isfile(filename):  
-        return pd.read_csv(filename)  
+def new_titanic_data():
+    """
+    This function will:
+    - take in a SQL_query
+    - create a connect_url to mySQL
+    - return a df of the given query from the titanic_db
+    """
+    url = get_db_url('titanic_db')
+    SQL_query = "select * from passengers"
+    return pd.read_sql(SQL_query, url)
+
+def get_titanic_data(filename="titanic.csv"):
+    """
+    This function will:
+    - Check local directory for csv file
+        - return if exists
+    - If csv doesn't exists:
+        - create a df of the SQL_query
+        - write df to csv
+    - Output titanic df
+    """
+    if os.path.exists(filename):
+        df = pd.read_csv(filename, index_col=0)
+        print('Found CSV')
+        return df
+    
     else:
-        db_url = get_connection('titanic_db')
-        query = '''
-                SELECT * FROM passengers
-                '''
-        titanic = pd.read_sql(query, db_url)
-        titanic.to_csv('titanic.csv', index=False)
-        return titanic
+        df = new_titanic_data()
+        
+        #want to save to csv
+        df.to_csv(filename)
+        print('Creating CSV')
+        return df
 
 
 def new_iris_data():
